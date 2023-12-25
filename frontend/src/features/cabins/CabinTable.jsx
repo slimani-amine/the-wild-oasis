@@ -4,6 +4,8 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCabins } from "../../services/apiCabins";
 import CabinRow from "./CabinRow";
+import { useCabins } from "../../hooks/useCabins";
+import Menus from "../../ui/Menus";
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -30,20 +32,13 @@ const TableHeader = styled.header`
 `;
 
 export default function CabinTable() {
-  const {
-    data: cabins,
-    isLaoding,
-    error,
-  } = useQuery({
-    queryKey: ["cabin"],
-    queryFn: getCabins,
-  });
+  const { cabins, isLaoding } = useCabins();
 
   if (isLaoding) {
     return <Spinner />;
   }
   return (
-    <div>
+    <Menus>
       <Table role="table">
         <TableHeader role="row ">
           <div></div>
@@ -58,6 +53,6 @@ export default function CabinTable() {
             return <CabinRow cabin={cabin} key={cabin.id} />;
           })}
       </Table>
-    </div>
+    </Menus>
   );
 }

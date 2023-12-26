@@ -103,6 +103,10 @@ const Footer = styled.footer`
 
 // A purely presentational component
 function BookingDataBox({ booking }) {
+  if (!booking || !booking.guests) {
+    return null;
+  }
+
   const {
     created_at,
     startDate,
@@ -115,8 +119,8 @@ function BookingDataBox({ booking }) {
     hasBreakfast,
     observations,
     isPaid,
-    guests: { fullName: guestName, email, country, countryFlag, nationalID },
-    cabins: { name: cabinName },
+    guests: { fullName, email, country, countryFlag, nationalID } = {}, 
+    cabins: { name: cabinName } = {}, 
   } = booking;
 
   return (
@@ -137,12 +141,11 @@ function BookingDataBox({ booking }) {
           ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")}
         </p>
       </Header>
-
       <Section>
         <Guest>
           {countryFlag && <Flag src={countryFlag} alt={`Flag of ${country}`} />}
           <p>
-            {guestName} {numberGuests > 1 ? `+ ${numberGuests - 1} guests` : ""}
+            {fullName} {numberGuests > 1 ? `+ ${numberGuests - 1} guests` : ""}
           </p>
           <span>&bull;</span>
           <p>{email}</p>
@@ -176,10 +179,9 @@ function BookingDataBox({ booking }) {
           <p>{isPaid ? "Paid" : "Will pay at property"}</p>
         </Price>
       </Section>
-
       <Footer>
         <p>Booked {format(new Date(created_at), "EEE, MMM dd yyyy, p")}</p>
-      </Footer>
+      </Footer>{" "}
     </StyledBookingDataBox>
   );
 }

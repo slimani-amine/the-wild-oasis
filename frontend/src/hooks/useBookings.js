@@ -23,7 +23,6 @@ export function useBookings() {
   const page = !searchParams.get("page") ? 1 : Number(searchParams.get("page"));
   //query
   const {
-    status,
     isLoading,
     data = {},
     error,
@@ -32,7 +31,6 @@ export function useBookings() {
     queryFn: () => getBookings({ filter, sortBy, page }),
   });
   const bookings = data.data || [];
-
   //prefetching
   const pageCount = Math.ceil(data?.count / PAGE_SIZE);
   if (page < pageCount)

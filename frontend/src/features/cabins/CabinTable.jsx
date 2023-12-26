@@ -1,58 +1,61 @@
-import styled from "styled-components";
 import Spinner from "../../ui/Spinner";
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getCabins } from "../../services/apiCabins";
 import CabinRow from "./CabinRow";
-import { useCabins } from "../../hooks/useCabins";
+import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
+import { useSearchParams } from "react-router-dom";
+import Empty from "../../ui/Empty";
+import { useCabins } from "../../hooks/useCabins";
 
-const Table = styled.div`
-  border: 1px solid var(--color-grey-200);
+function CabinTable() {
+  const { isLoading, cabins = [] } = useCabins();
+  const [searchParams] = useSearchParams();
 
-  font-size: 1.4rem;
-  background-color: var(--color-grey-0);
-  border-radius: 7px;
-  overflow: hidden;
-`;
+  if (isLoading) return <Spinner />;
+  if (!cabins.length) return <Empty resourceName="cabins" />;
 
-const TableHeader = styled.header`
-  display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
+  // 1) FILTER
+  const filterValue = searchParams.get("discount") || "all";
 
-  background-color: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-100);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  font-weight: 600;
-  color: var(--color-grey-600);
-  padding: 1.6rem 2.4rem;
-`;
+  let filteredCabins;
+  if (filterValue === "all") filteredCabins = cabins;
+  if (filterValue === "no-discount")
+    filteredCabins = cabins.filter((cabin) => cabin.discount === 0);
+  if (filterValue === "with-discount")
+    filteredCabins = cabins.filter((cabin) => cabin.discount > 0);
 
-export default function CabinTable() {
-  const { cabins, isLaoding } = useCabins();
+  // 2) SORT
+  const sortBy = searchParams.get("sortBy") || "startDate-asc";
 
-  if (isLaoding) {
-    return <Spinner />;
-  }
+  const sortedCabins =
+    filteredCabins && Array.isArray(filteredCabins)
+      ? filteredCabins.sort((a, b) => {
+          const [field, direction] = sortBy.split("-");
+          const modifier = direction === "asc" ? 1 : -1;
+          return (a[field] - b[field]) * modifier;
+        })
+      : [];
+
   return (
     <Menus>
-      <Table role="table">
-        <TableHeader role="row ">
+      <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
+        <Table.Header>
           <div></div>
           <div>Cabin</div>
           <div>Capacity</div>
           <div>Price</div>
           <div>Discount</div>
           <div></div>
-        </TableHeader>
-        {cabins &&
-          cabins.map((cabin) => {
-            return <CabinRow cabin={cabin} key={cabin.id} />;
-          })}
+        </Table.Header>
+
+        <Table.Body
+          // data={cabins}
+          // data={filteredCabins}
+          data={sortedCabins}
+          render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
+        />
       </Table>
     </Menus>
   );
 }
+
+export default CabinTable;

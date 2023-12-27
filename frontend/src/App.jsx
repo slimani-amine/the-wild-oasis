@@ -38,7 +38,7 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppLayout />
-              </ProtectedRoute>
+              </ProtectedRoute> 
             }
           >
             <Route index element={<Navigate replace to="dashboard" />} />

@@ -45,21 +45,20 @@ export default function Filter({ filterField, options }) {
     searchParams.set("page", 1);
     setSearchParams(searchParams);
   };
+
   return (
     <StyledFilter>
       {options &&
-        options.map((option) => {
-          return (
-            <FilterButton
-              key={option.value}
-              active={currentFilter === option.value}
-              disabled={currentFilter === option.value}
-              onClick={() => handleClick(option.value)}
-            >
-              {option.label}
-            </FilterButton>
-          );
-        })}
+        options.map((option, index) => (
+          <FilterButton
+            key={option.value}
+            active={currentFilter === option.value || (index === 0 && !currentFilter)}
+            disabled={currentFilter === option.value}
+            onClick={() => handleClick(option.value)}
+          >
+            {option.label}
+          </FilterButton>
+        ))}
     </StyledFilter>
   );
 }
